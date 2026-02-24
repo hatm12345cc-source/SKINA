@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VN7 | أبوعتب للبرمجة والتكنولوجيا</title>
+    <style>
+        :root {
+            --bg-dark: #050507;
+            --card-bg: #0f0f13;
+            --accent-purple: #8e2de2;
+            --accent-blue: #00e5ff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0; padding: 0;
+            text-align: center;
+        }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 5%; background: #000;
+            border-bottom: 2px solid var(--accent-purple);
+            position: sticky; top: 0; z-index: 1000;
+        }
+
+        .menu-toggle {
+            width: 45px; height: 45px;
+            cursor: pointer; border-radius: 12px;
+            border: 1px solid var(--accent-purple);
+        }
+
+        .logo { font-size: 26px; font-weight: bold; }
+        .logo span { color: var(--accent-purple); }
+
+        .container { max-width: 600px; margin: 20px auto; padding: 15px; }
+
+        .page-section { display: none; }
+        .active { display: block; animation: fadeIn 0.4s; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .hero-btn {
+            background: #5865F2; padding: 20px; border-radius: 20px;
+            text-align: center; text-decoration: none; color: white;
+            font-weight: bold; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px; font-size: 18px;
+        }
+
+        .section-title {
+            font-size: 20px; color: var(--accent-blue); margin: 30px 0 15px;
+            text-align: right; padding-right: 15px; border-right: 5px solid var(--accent-purple);
+        }
+
+        .card {
+            background: var(--card-bg); border-radius: 22px; padding: 15px;
+            text-align: right; border: 1px solid #1f1f27; margin-bottom: 15px;
+        }
+
+        .card img { width: 100%; border-radius: 15px; margin-bottom: 12px; border: 1px solid #333; }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .btn-sm {
+            display: block; text-align: center; padding: 12px; border-radius: 12px;
+            text-decoration: none; color: white; font-weight: bold; font-size: 12px; margin-top: 8px;
+        }
+
+        footer { padding: 30px; color: #555; font-size: 12px; }
+
+        @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="https://raw.githubusercontent.com/Anis-Kabbaj/DELTA-App/main/Delta.png" class="menu-toggle" onclick="toggleMenu()">
+    <div class="logo">V<span>N7</span></div>
+</header>
+
+<div class="container">
+    
+    <div id="main-page" class="page-section active">
+        <div class="section-title">القائمة الرئيسية 🏠</div>
+        <a href="https://discord.gg/haX59nFsM" class="hero-btn">انضم لسيرفر الديسكورد الرسمي (VN7) 💬</a>
+        <p>اضغط على الأيقونة فوق لفتح قائمة الهاكات</p>
+    </div>
+
+    <div id="hacks-page" class="page-section">
+        
+        <div class="section-title">هاك آيفون 🍎</div>
+        <div class="card">
+            <img src="https://raw.githubusercontent.com/Anis-Kabbaj/DELTA-App/main/Delta.png">
+            <h2>Delta iOS</h2>
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+                <a href="itms-services://?action=download-manifest&url=https://delta.bz/manifest.plist" class="btn-sm" style="background:#8e2de2;">تثبيت مباشر</a>
+                <a href="https://nekoo.eu.org/W7dMvm" class="btn-sm" style="background:#6a11cb;">Delta VR7 (جديد)</a>
+                <a href="https://cdn.gloopup.net/file/Delta-2.701.966.ipa" class="btn-sm" style="background:#007bff;">ملف iPA</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>SkibX iOS</h2>
+            <div style="display: flex; gap: 5px;">
+                <a href="itms-services://?action=download-manifest&url=https://skibx.com/ota.plist" class="btn-sm" style="background:#8e2de2; flex:1">تثبيت SkibX</a>
+            </div>
+        </div>
+
+        <div class="section-title">هاك أندرويد 🤖</div>
+        <div class="grid">
+            <div class="card">
+                <img src="https://raw.githubusercontent.com/Anis-Kabbaj/DELTA-App/main/Delta.png">
+                <h3>هاك دلتا</h3>
+                <a href="https://www.mediafire.com/file/ti5geyfey7thof9/Delta-2.707.734.apk/file" class="btn-sm" style="background:#ff3838">تحميل</a>
+            </div>
+            <div class="card">
+                <h3>هاك SkibX</h3>
+                <a href="https://www.mediafire.com/file/khh1d18x0sbdfc6/SkibX-2.707.734.apk/file" class="btn-sm" style="background:#ff3838">تحميل</a>
+            </div>
+            </div>
+
+        <div class="section-title">هاك الكمبيوتر 💻</div>
+        <div class="grid">
+            <div class="card">
+                <h3>هاك Semo PC</h3>
+                <a href="https://www.dropbox.com/scl/fi/ppuzmw1nqixti0t55r3y9/Semo-Executor-v3.50.rar?rlkey=nf99s3g8r9krjfcvwedxmgqwy&st=lt6s1bf9&dl=1" class="btn-sm" style="background:#007bff">تحميل V3.50</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    VN7 | من صنع أبوعتب للبرمجة والتكنولوجيا © 2026
+</footer>
+
+<script>
+    function toggleMenu() {
+        const main = document.getElementById('main-page');
+        const hacks = document.getElementById('hacks-page');
+        if (main.classList.contains('active')) {
+            main.classList.remove('active');
+            hacks.classList.add('active');
+        } else {
+            hacks.classList.remove('active');
+            main.classList.add('active');
+        }
+    }
+</script>
+
+</body>
+</html>
