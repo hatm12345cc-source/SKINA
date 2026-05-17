@@ -1,0 +1,182 @@
+local ScreenGui = Instance.new("ScreenGui")
+
+local Main = Instance.new("Frame")
+local MainCorner = Instance.new("UICorner")
+local MainStroke = Instance.new("UIStroke")
+
+local Title = Instance.new("TextLabel")
+
+local BGImage = Instance.new("ImageLabel")
+local BGSpin = Instance.new("ImageLabel")
+
+local SideImage = Instance.new("ImageLabel")
+
+local TabsFrame = Instance.new("Frame")
+local TabsCorner = Instance.new("UICorner")
+
+local HomeTab = Instance.new("TextButton")
+local HomeCorner = Instance.new("UICorner")
+
+local MainPage = Instance.new("Frame")
+
+local ProfileImage = Instance.new("ImageLabel")
+local ProfileCorner = Instance.new("UICorner")
+
+local UserText = Instance.new("TextLabel")
+local InfoText = Instance.new("TextLabel")
+
+local Toggle = Instance.new("ImageButton")
+local ToggleCorner = Instance.new("UICorner")
+
+ScreenGui.Parent = (gethui and gethui()) or game.CoreGui
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- الواجهة الرئيسية
+Main.Parent = ScreenGui
+Main.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Main.AnchorPoint = Vector2.new(0.5,0.5)
+Main.Position = UDim2.new(0.5,0,0.5,0)
+Main.Size = UDim2.new(0,520,0,330)
+Main.Active = true
+Main.Draggable = true
+
+MainCorner.Parent = Main
+MainCorner.CornerRadius = UDim.new(0,22)
+
+MainStroke.Parent = Main
+MainStroke.Color = Color3.fromRGB(0,120,255)
+MainStroke.Thickness = 4
+
+-- الخلفية
+BGImage.Parent = Main
+BGImage.BackgroundTransparency = 1
+BGImage.Size = UDim2.new(1,0,1,0)
+BGImage.Image = "rbxassetid://113482364322747"
+BGImage.ScaleType = Enum.ScaleType.Crop
+
+local BGCorner = Instance.new("UICorner")
+BGCorner.Parent = BGImage
+BGCorner.CornerRadius = UDim.new(0,22)
+
+-- العنوان
+Title.Parent = Main
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1,0,0,55)
+Title.Font = Enum.Font.GothamBlack
+Title.Text = "الدراك"
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.TextScaled = true
+
+-- الساعة الدوارة بالنص
+BGSpin.Parent = Main
+BGSpin.BackgroundTransparency = 1
+BGSpin.AnchorPoint = Vector2.new(0.5,0.5)
+BGSpin.Position = UDim2.new(0.67,0,0.58,0)
+BGSpin.Size = UDim2.new(0,250,0,250)
+BGSpin.Image = "rbxassetid://120561564583563"
+
+-- الصورة فوق يسار
+SideImage.Parent = Main
+SideImage.BackgroundTransparency = 1
+SideImage.Size = UDim2.new(0,125,0,125)
+SideImage.Position = UDim2.new(0,-50,0,-45)
+SideImage.Rotation = 18
+SideImage.Image = "rbxassetid://79389566961023"
+
+-- قائمة التابات
+TabsFrame.Parent = Main
+TabsFrame.BackgroundColor3 = Color3.fromRGB(5,5,15)
+TabsFrame.BackgroundTransparency = 0.2
+TabsFrame.Position = UDim2.new(0,15,0,70)
+TabsFrame.Size = UDim2.new(0,135,1,-85)
+
+TabsCorner.Parent = TabsFrame
+TabsCorner.CornerRadius = UDim.new(0,18)
+
+-- زر الرئيسية
+HomeTab.Parent = TabsFrame
+HomeTab.BackgroundColor3 = Color3.fromRGB(0,90,255)
+HomeTab.Position = UDim2.new(0,8,0,8)
+HomeTab.Size = UDim2.new(1,-16,0,45)
+HomeTab.Font = Enum.Font.GothamBlack
+HomeTab.Text = "الرئيسية"
+HomeTab.TextColor3 = Color3.fromRGB(255,255,255)
+HomeTab.TextScaled = true
+
+HomeCorner.Parent = HomeTab
+HomeCorner.CornerRadius = UDim.new(0,14)
+
+-- الصفحة الرئيسية
+MainPage.Parent = Main
+MainPage.BackgroundTransparency = 1
+MainPage.Position = UDim2.new(0,165,0,70)
+MainPage.Size = UDim2.new(1,-180,1,-85)
+
+-- صورة اللاعب
+ProfileImage.Parent = MainPage
+ProfileImage.BackgroundTransparency = 1
+ProfileImage.Position = UDim2.new(0,10,0,10)
+ProfileImage.Size = UDim2.new(0,90,0,90)
+ProfileImage.Image =
+"https://www.roblox.com/headshot-thumbnail/image?userId="
+..game.Players.LocalPlayer.UserId..
+"&width=420&height=420&format=png"
+
+ProfileCorner.Parent = ProfileImage
+ProfileCorner.CornerRadius = UDim.new(1,0)
+
+-- الاسم
+UserText.Parent = MainPage
+UserText.BackgroundTransparency = 1
+UserText.Position = UDim2.new(0,115,0,18)
+UserText.Size = UDim2.new(1,-120,0,40)
+UserText.Font = Enum.Font.GothamBlack
+UserText.Text = "@"..game.Players.LocalPlayer.Name
+UserText.TextColor3 = Color3.fromRGB(255,255,255)
+UserText.TextScaled = true
+UserText.TextXAlignment = Enum.TextXAlignment.Left
+
+-- النص
+InfoText.Parent = MainPage
+InfoText.BackgroundTransparency = 1
+InfoText.Position = UDim2.new(0,10,0,110)
+InfoText.Size = UDim2.new(1,-20,0,120)
+InfoText.Font = Enum.Font.GothamBold
+InfoText.Text = "اهلاً بك في واجهة الدراك\nكل الميزات تعمل بدون اي فقدان"
+InfoText.TextColor3 = Color3.fromRGB(255,255,255)
+InfoText.TextWrapped = true
+InfoText.TextScaled = true
+
+-- الزر الجانبي
+Toggle.Parent = ScreenGui
+Toggle.BackgroundTransparency = 1
+Toggle.AnchorPoint = Vector2.new(0.5,0.5)
+Toggle.Position = UDim2.new(0,75,0.5,0)
+Toggle.Size = UDim2.new(0,60,0,60)
+Toggle.Image = "rbxassetid://120561564583563"
+Toggle.Active = true
+Toggle.Draggable = true
+
+ToggleCorner.Parent = Toggle
+ToggleCorner.CornerRadius = UDim.new(1,0)
+
+Toggle.MouseButton1Click:Connect(function()
+	Main.Visible = not Main.Visible
+end)
+
+-- دوران الساعة بالخلفية
+task.spawn(function()
+	while true do
+		BGSpin.Rotation = BGSpin.Rotation + 6
+		task.wait(0.01)
+	end
+end)
+
+-- دوران الزر الجانبي
+task.spawn(function()
+	while true do
+		Toggle.Rotation = Toggle.Rotation + 6
+		task.wait(0.01)
+	end
+end)
