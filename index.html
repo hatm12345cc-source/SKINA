@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مفحوص IP — كل معلومات العنوان</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',sans-serif}
+  body{background:#f0fdf4;color:#052e16;min-height:100vh}
+  header{background:linear-gradient(135deg,#15803d,#16a34a,#22c55e);color:#fff;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;box-shadow:0 4px 20px rgba(22,163,74,.35)}
+  header h1{font-size:22px;font-weight:800}
+  header .badge{background:rgba(255,255,255,.2);padding:6px 14px;border-radius:999px;font-size:13px;font-weight:700}
+  main{max-width:1150px;margin:0 auto;padding:24px 16px}
+  .card{background:#fff;border:2px solid #bbf7d0;border-radius:20px;padding:22px;margin-bottom:22px;box-shadow:0 6px 24px rgba(22,163,74,.08)}
+  .card h2{color:#15803d;margin-bottom:14px;font-size:19px;display:flex;align-items:center;gap:8px}
+  .scan-box{display:flex;gap:10px;flex-wrap:wrap}
+  .scan-box input{flex:1;min-width:220px;padding:15px 18px;border:2px solid #86efac;border-radius:16px;font-size:17px;outline:none;transition:.3s;background:#f7fef9;color:#052e16}
+  .scan-box input:focus{border-color:#16a34a;box-shadow:0 0 0 4px rgba(34,197,94,.15)}
+  .btn{background:linear-gradient(135deg,#15803d,#22c55e);color:#fff;border:none;padding:15px 32px;border-radius:16px;font-size:17px;font-weight:800;cursor:pointer;transition:.25s;box-shadow:0 4px 14px rgba(22,163,74,.35)}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(22,163,74,.45)}
+  .btn:disabled{opacity:.6;cursor:wait;transform:none}
+  .btn-ghost{background:#f0fdf4;color:#15803d;border:2px solid #86efac}
+  .btn-ghost:hover{background:#dcfce7}
+  .my-ip-chip{display:flex;align-items:center;gap:12px;background:#f0fdf4;border:2px dashed #4ade80;border-radius:14px;padding:12px 16px;margin-top:14px;flex-wrap:wrap}
+  .my-ip-chip b{font-size:20px;color:#15803d;direction:ltr}
+  #spinner{display:none;text-align:center;padding:20px}
+  .sp{width:46px;height:46px;border:5px solid #bbf7d0;border-top-color:#16a34a;border-radius:50%;margin:0 auto 10px;animation:rot 0.9s linear infinite}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  #spinner p{color:#15803d;font-weight:700}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+  .info-item{background:#f7fef9;border:1.5px solid #bbf7d0;border-radius:14px;padding:12px 14px}
+  .info-item .lbl{font-size:12.5px;color:#15803d;font-weight:700;opacity:.75;margin-bottom:4px}
+  .info-item .val{font-size:16px;font-weight:700;color:#052e16;word-break:break-word}
+  #map{height:430px;border-radius:18px;border:2px solid #bbf7d0;z-index:1}
+  .search-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .search-row input{flex:1;min-width:200px;padding:11px 14px;border:2px solid #86efac;border-radius:12px;font-size:14px;outline:none}
+  .search-row button{padding:11px 20px;border-radius:12px;font-size:14px}
+  .sv-frame{width:100%;height:360px;border:2px solid #bbf7d0;border-radius:18px}
+  .place{display:flex;justify-content:space-between;align-items:center;background:#f7fef9;border:1.5px solid #bbf7d0;border-radius:12px;padding:10px 14px;margin-bottom:8px}
+  .place .n{font-weight:700}
+  .place .d{color:#15803d;font-size:13px;font-weight:700}
+  .link-btn{display:inline-block;background:#16a34a;color:#fff;padding:11px 22px;border-radius:12px;text-decoration:none;font-weight:800;margin-top:10px;font-size:14px}
+  .link-btn.ghost{background:#fff;color:#15803d;border:2px solid #16a34a}
+  .note{background:#dcfce7;border-right:5px solid #16a34a;border-radius:12px;padding:12px 16px;font-size:14px;color:#14532d;margin-top:14px;line-height:1.8}
+  .error-box{background:#fef2f2;border:2px solid #fca5a5;border-radius:14px;padding:16px;color:#7f1d1d;text-align:center;font-weight:700;margin-top:14px}
+  #permission{position:fixed;inset:0;background:rgba(5,46,22,.75);display:none;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px)}
+  #permission.show{display:flex}
+  .perm-card{background:#fff;border-radius:22px;padding:32px;max-width:430px;width:92%;text-align:center;border:3px solid #4ade80;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+  .perm-card h3{color:#15803d;font-size:21px;margin-bottom:10px}
+  .perm-card p{color:#14532d;margin-bottom:22px;line-height:1.9}
+  .perm-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .hide{display:none!important}
+  footer{text-align:center;padding:20px;color:#15803d;font-size:13px;font-weight:700}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌐 مفحوص IP</h1>
+  <span class="badge">كل معلومات العنوان في مكان واحد</span>
+</header>
+
+<main>
+  <!-- قسم الفحص الموحد -->
+  <section class="card">
+    <h2>🔍 فحص عنوان IP</h2>
+    <div class="scan-box">
+      <input id="ipInput" type="text" placeholder="حط الـ IP هنا... مثال: 8.8.8.8" autocomplete="off" spellcheck="false">
+      <button class="btn" id="scanBtn">فحص</button>
+      <button class="btn btn-ghost" id="myIpBtn">عنواني</button>
+    </div>
+    <div id="myIpArea" class="my-ip-chip hide">
+      <span>عنوان IP حقك:</span>
+      <b id="myIpText">—</b>
+      <button class="btn btn-ghost" id="refreshIpBtn" style="padding:8px 16px;font-size:13px">🔄 تحديث عنوان</button>
+    </div>
+    <div id="spinner"><div class="sp"></div><p>جاري الفحص والاتصال بخدمات IP...</p></div>
+    <div id="errorArea"></div>
+  </section>
+
+  <!-- النتائج -->
+  <section class="card hide" id="resultCard">
+    <h2>📋 تفاصيل الـ IP</h2>
+    <div class="grid" id="infoGrid"></div>
+    <div class="note" id="accuracyNote"></div>
+  </section>
+
+  <!-- الخريطة -->
+  <section class="card hide" id="mapCard">
+    <h2>🗺️ الموقع الجغرافي — خريطة تفاعلية (اسحب وزد زوم حتى الشارع)</h2>
+    <div class="search-row">
+      <input id="mapSearch" type="text" placeholder="ابحث في الخريطة: مدينة، شارع، محل...">
+      <button class="btn" id="mapSearchBtn" style="padding:11px 20px;font-size:14px">بحث</button>
+    </div>
+    <div id="map"></div>
+    <div id="addressLine" style="margin-top:12px;font-weight:700;color:#15803d;font-size:15px"></div>
+    <a class="link-btn" id="gmapLink" target="_blank" rel="noopener">📍 فتح الموقع في خرائط قوقل</a>
+  </section>
+
+  <!-- صور الشارع -->
+  <section class="card hide" id="streetCard">
+    <h2>🛣️ صور الشارع (Street View)</h2>
+    <iframe class="sv-frame" id="svFrame" title="Street View"></iframe>
+    <a class="link-btn ghost" id="svLink" target="_blank" rel="noopener">🌍 فتح صور الشارع بالكامل في قوقل</a>
+  </section>
+
+  <!-- الأماكن القريبة -->
+  <section class="card hide" id="placesCard">
+    <h2>🏪 المحلات والأماكن القريبة (ضمن 400 متر)</h2>
+    <div id="placesList"></div>
+  </section>
+
+  <!-- بيانات الجهاز -->
+  <section class="card hide" id="deviceCard">
+    <h2>📱 بيانات الجهاز الذي يستخدم الـ IP</h2>
+    <div class="grid" id="deviceGrid"></div>
+  </section>
+
+  <!-- سجل الملكية -->
+  <section class="card hide" id="whoisCard">
+    <h2>📜 سجل الملكية WHOIS / RDAP</h2>
+    <div class="grid" id="whoisGrid"></div>
+    <div class="note">البريد والهاتف يكونان محجوبين في أغلب السجلات بموجب الخصوصية (REDACTED).</div>
+  </section>
+</main>
+
+<footer>مفحوص IP — بيانات تقريبية من مصادر عامة (ipwho.is / ipapi.co / freeipapi / OpenStreetMap)</footer>
+
+<!-- نافذة الإذن -->
+<div id="permission">
+  <div class="perm-card">
+    <h3>هل تسمح بأخذ عنوان IP حقك؟</h3>
+    <p>نحتاج عنوانك لنعرض لك كل معلومات موقعك الحالي على الخريطة، الدولة، المدينة، المزود، وبيانات جهازك.</p>
+    <div class="perm-btns">
+      <button class="btn" id="permYes">نعم، خذ عنواني</button>
+      <button class="btn btn-ghost" id="permNo">لا</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= أدوات عامة ================= */
+const $=id=>document.getElementById(id);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+async function fetchWithTimeout(url,ms=10000){
+  const c=new AbortController();
+  const t=setTimeout(()=>c.abort(),ms);
+  try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw new Error('HTTP '+r.status);return r;}
+  finally{clearTimeout(t);}
+}
+
+function flagEmoji(cc){
+  if(!cc) return '🌐';
+  return cc.toUpperCase().replace(/./g,c=>String.fromCodePoint(127397+c.charCodeAt(0)));
+}
+
+function distM(lat1,lon1,lat2,lon2){
+  const R=6371000,toR=x=>x*Math.PI/180;
+  const dLat=toR(lat2-lat1),dLon=toR(lon2-lon1);
+  const a=Math.sin(dLat/2)**2+Math.cos(toR(lat1))*Math.cos(toR(lat2))*Math.sin(dLon/2)**2;
+  return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
+}
+
+function showSpin(on){$('spinner').style.display=on?'block':'none';$('scanBtn').disabled=on;}
+function showErr(msg){
+  $('errorArea').innerHTML=`<div class="error-box">⚠️ ${msg}<br><button class="btn btn-ghost" style="margin-top:12px" onclick="doScan(currentInput())">🔄 إعادة المحاولة</button></div>`;
+}
+function currentInput(){return $('ipInput').value.trim();}
+function hideAllResults(){['resultCard','mapCard','streetCard','placesCard','deviceCard','whoisCard'].forEach(id=>$(id).classList.add('hide'));}
+
+/* ================= 1) جلب عنواني ================= */
+async function getMyIP(){
+  const urls=[
+    'https://api.ipify.org?format=json',
+    'https://api.ipify.org/?format=json',
+    'https://ipwho.is/',
+    'https://ipapi.co/json/'
+  ];
+  for(const u of urls){
+    try{
+      const j=await (await fetchWithTimeout(u,8000)).json();
+      if(j&&j.ip) return j.ip;
+    }catch(e){}
+  }
+  throw new Error('ما قدرت أحصل عنوانك');
+}
+
+/* ================= 2) معلومات IP مع 3 مصادر احتياطية ================= */
+function normalizeWhois(j){
+  if(!j||!j.ip)throw new Error('bad');
+  return {
+    ip:j.ip,type:j.type,continent:j.continent,country:j.country,countryCode:j.country_code,
+    region:j.region,city:j.city,lat:j.latitude,lon:j.longitude,postal:j.postal,
+    timezone:j.timezone,utc:j.utc_offset,isp:j.connection?.isp,org:j.connection?.org,
+    asn:j.connection?.asn,domain:j.connection?.domain,currency:j.currency?.code,
+    flag:flagEmoji(j.country_code)
+  };
+}
+function normalizeIpapi(j){
+  if(!j||!j.ip)throw new Error('bad');
+  return {
+    ip:j.ip,type:j.type,continent:j.continent,country:j.country_name,countryCode:j.country_code,
+    region:j.region,city:j.city,lat:j.latitude,lon:j.longitude,postal:j.postal,
+    timezone:j.timezone,utc:'',isp:j.org,org:j.org,asn:j.asn,domain:'',
+    currency:j.currency,flag:flagEmoji(j.country_code)
+  };
+}
+function normalizeFree(j){
+  if(!j||!j.ipAddress)throw new Error('bad');
+  return {
+    ip:j.ipAddress,type:'',continent:j.continent,country:j.countryName,countryCode:j.countryCode,
+    region:j.regionName,city:j.cityName,lat:j.latitude,lon:j.longitude,postal:j.zipCode,
+    timezone:j.timeZone,utc:'',isp:j.isp,org:j.organization,asn:j.asn,domain:j.asnOrganization,
+    currency:j.currency,flag:flagEmoji(j.countryCode)
+  };
+}
+
+async function getIPInfo(ip){
+  const providers=[
+    ()=>fetchWithTimeout(`https://ipwho.is/${ip}`,12000).then(r=>r.json()).then(normalizeWhois),
+    ()=>fetchWithTimeout(`https://ipapi.co/${ip}/json/`,12000).then(r=>r.json()).then(normalizeIpapi),
+    ()=>fetchWithTimeout(`https://freeipapi.com/api/json/${ip}`,12000).then(r=>r.json()).then(normalizeFree)
+  ];
+  let lastErr=null;
+  for(const p of providers){
+    try{return await p();}catch(e){lastErr=e;}
+  }
+  throw lastErr||new Error('f');
+}
+
+/* ================= 3) الخريطة ================= */
+let map=null,marker=null,circle=null,currentLat=null,currentLon=null,currentIP='';
+
+function loadMap(lat,lon,label){
+  currentLat=lat;currentLon=lon;
+  if(!map){
+    map=L.map('map').setView([lat,lon],17);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+    marker=L.marker([lat,lon],{draggable:true}).addTo(map);
+    circle=L.circle([lat,lon],{radius:1000,color:'#16a34a',fillColor:'#22c55e',fillOpacity:.12,weight:2}).addTo(map);
+    marker.on('dragend',async e=>{
+      const p=marker.getLatLng();
+      currentLat=p.lat;currentLon=p.lng;
+      circle.setLatLng([p.lat,p.lng]);
+      updateLocationExtras();
+    });
+  }else{
+    map.setView([lat,lon],17);
+    marker.setLatLng([lat,lon]);
+    circle.setLatLng([lat,lon]);
+  }
+  marker.bindPopup(`<b>${label}</b>`).openPopup();
+  $('gmapLink').href=`https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+  $('svLink').href=`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lon}`;
+  setTimeout(()=>{if(map)map.invalidateSize();},250);
+  updateLocationExtras();
+}
+
+async function updateLocationExtras(){
+  // العنوان بالعربي
+  try{
+    const j=await (await fetchWithTimeout(`https://nominatim.openstreetmap.org/reverse?lat=${currentLat}&lon=${currentLon}&format=json&accept-language=ar`,10000)).json();
+    $('addressLine').textContent='📍 العنوان التقريبي: '+(j.display_name||'غير متوفر');
+  }catch(e){$('addressLine').textContent='📍 العنوان التقريبي: غير متوفر';}
+  loadNearby(currentLat,currentLon);
+  // تحديث صور الشارع
+  $('svFrame').src=`https://www.google.com/maps?q=${currentLat},${currentLon}&layer=c&cbll=${currentLat},${currentLon}&output=svembed`;
+  $('gmapLink').href=`https://www.google.com/maps/search/?api=1&query=${currentLat},${currentLon}`;
+  $('svLink').href=`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${currentLat},${currentLon}`;
+}
+
+/* ================= 4) الأماكن القريبة (OpenStreetMap) ================= */
+async function loadNearby(lat,lon){
+  $('placesList').innerHTML='<p style="color:#15803d;font-weight:700">جاري البحث عن المحلات القريبة...</p>';
+  const q=`[out:json][timeout:20];(node["shop"](around:400,${lat},${lon});node["amenity"](around:400,${lat},${lon});node["tourism"](around:400,${lat},${lon});way["shop"](around:400,${lat},${lon});way["amenity"](around:400,${lat},${lon}););out center 30;`;
+  const servers=[
+    'https://overpass-api.de/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter'
+  ];
+  for(const s of servers){
+    try{
+      const j=await (await fetchWithTimeout(s+'?data='+encodeURIComponent(q),18000)).json();
+      const els=(j.elements||[]).filter(e=>e.tags&&(e.tags.name));
+      if(!els.length){$('placesList').innerHTML='<p style="color:#15803d">ما فيه محلات مسجلة ضمن 400 متر.</p>';return;}
+      els.sort((a,b)=>distM(lat,lon,a.lat??a.center?.lat??0,a.lon??a.center?.lon??0)-distM(lat,lon,b.lat??b.center?.lat??0,b.lon??b.center?.lon??0));
+      const cat=e=>e.tags.shop||e.tags.amenity||e.tags.tourism||'مكان';
+      $('placesList').innerHTML=els.slice(0,25).map(e=>{
+        const d=distM(lat,lon,e.lat??e.center?.lat??0,e.lon??e.center?.lon??0);
+        return `<div class="place"><span class="n">${e.tags.name}</span><span class="d">${cat(e)} • ${d} متر</span></div>`;
+      }).join('');
+      return;
+    }catch(e){}
+  }
+  $('placesList').innerHTML='<p style="color:#b91c1c">تعذر الاتصال بخدمة الأماكن القريبة.</p>';
+}
+
+/* ================= 5) سجل الملكية RDAP ================= */
+async function loadRDAP(ip){
+  try{
+    const j=await (await fetchWithTimeout('https://rdap.org/ip/'+ip,15000)).json();
+    let name='غير متوفر',email='غير متوفر',phone='غير متوفر';
+    (j.entities||[]).forEach(en=>{
+      const vc=en.vcardArray&&en.vcardArray[1]||[];
+      vc.forEach(row=>{
+        if(row[0]==='fn'&&row[3]&&name==='غير متوفر')name=row[3];
+        if(row[0]==='email'&&row[3]&&email==='غير متوفر')email=row[3];
+        if(row[0]==='tel'&&row[3]&&phone==='غير متوفر')phone=row[3];
+      });
+    });
+    $('whoisGrid').innerHTML=`
+      <div class="info-item"><div class="lbl">المسجل</div><div class="val">${name}</div></div>
+      <div class="info-item"><div class="lbl">البريد</div><div class="val" style="direction:ltr;text-align:right">${email}</div></div>
+      <div class="info-item"><div class="lbl">الهاتف</div><div class="val" style="direction:ltr;text-align:right">${phone}</div></div>
+      <div class="info-item"><div class="lbl">جهة السجل</div><div class="val">${j.port43||j.rdapConformance?.join(', ')||'عام'}</div></div>`;
+  }catch(e){
+    $('whoisGrid').innerHTML='<div class="info-item"><div class="lbl">البريد/الهاتف</div><div class="val">محجوب بخصوصية — لا يمكن استخراجه من مصادر عامة</div></div>';
+  }
+}
+
+/* ================= 6) بيانات الجهاز ================= */
+function deviceInfo(){
+  const ua=navigator.userAgent,uaData=navigator.userAgentData;
+  let os='غير معروف',browser='غير معروف',device='كمبيوتر';
+  if(uaData&&uaData.platform)os=uaData.platform;
+  else if(/Windows/.test(ua))os='Windows';else if(/Android/.test(ua))os='Android';else if(/iPhone|iPad/.test(ua))os='iOS';else if(/Mac/.test(ua))os='macOS';else if(/Linux/.test(ua))os='Linux';
+  if(/Edg\//.test(ua))browser='Edge';else if(/Chrome\//.test(ua))browser='Chrome';else if(/Firefox\//.test(ua))browser='Firefox';else if(/Safari\//.test(ua))browser='Safari';else if(/Opera|OPR\//.test(ua))browser='Opera';
+  if(uaData&&uaData.mobile)device=uaData.mobile?'هاتف/جوال':'كمبيوتر';
+  else if(/Android|iPhone|iPad|Mobile/.test(ua))device=/iPad/.test(ua)?'جهاز لوحي':'هاتف/جوال';
+  const net=navigator.connection?.effectiveType||'غير معروف';
+  return [
+    ['نوع الجهاز',device],
+    ['نظام التشغيل',os],
+    ['المتصفح',browser],
+    ['الشاشة',screen.width+' × '+screen.height+'px'],
+    ['اللغة',navigator.language],
+    ['نوع الاتصال',net],
+    ['الذاكرة',navigator.deviceMemory?navigator.deviceMemory+' GB':'غير معروف'],
+    ['المعالجات',navigator.hardwareConcurrency||'غير معروف']
+  ];
+}
+
+/* ================= 7) عرض النتائج ================= */
+function renderInfo(d){
+  const items=[
+    ['عنوان IP',d.ip||'—','ltr'],
+    ['الدولة',`${d.flag||''} ${d.country||'—'}`,''],
+    ['المنطقة',d.region||'—',''],
+    ['المدينة',d.city||'—',''],
+    ['الرمز البريدي',d.postal||'—','ltr'],
+    ['مزود الخدمة ISP',d.isp||'—',''],
+    ['المنظمة',d.org||'—',''],
+    ['ASN',d.asn||'—','ltr'],
+    ['نطاق المزود',d.domain||'—','ltr'],
+    ['خط العرض',d.lat,'ltr'],
+    ['خط الطول',d.lon,'ltr'],
+    ['المنطقة الزمنية',d.timezone||'—','ltr'],
+    ['العملة',d.currency||'—',''],
+    ['نوع العنوان',d.type||'—','']
+  ];
+  $('infoGrid').innerHTML=items.map(([l,v,dir])=>
+    `<div class="info-item"><div class="lbl">${l}</div><div class="val" style="direction:${dir==='ltr'?'ltr':'rtl'};text-align:${dir==='ltr'?'left':'right'}">${v}</div></div>`).join('');
+  $('accuracyNote').innerHTML='⚠️ ملاحظة دقة: الإحداثيات تقريبية على مستوى <b>المدينة/مزود الخدمة</b> وليست عنوان المنزل بالضبط — هذا الحد الأقصى لأي خدمة IP عامة. اسحب المؤشر الأخضر على الخريطة لتحديد نقطة أدق، وزد الزوم حتى مستوى الشارع.';
+}
+
+/* ================= 8) الفحص الرئيسي الموحد ================= */
+async function doScan(ip){
+  hideAllResults();
+  $('errorArea').innerHTML='';
+  if(!ip){showErr('اكتب عنوان IP أولًا ثم اضغط فحص.');return;}
+  if(!/^(\d{1,3}\.){3}\d{1,3}$|^[0-9a-fA-F:]+$/.test(ip)){showErr('صيغة الـ IP غير صحيحة. مثال: 8.8.8.8');return;}
+  showSpin(true);
+  try{
+    currentIP=ip;
+    const d=await getIPInfo(ip);           // 3 مصادر احتياطية
+    showSpin(false);
+    $('resultCard').classList.remove('hide');
+    renderInfo(d);
+    $('mapCard').classList.remove('hide');
+    loadMap(d.lat,d.lon,`${d.city||''} — ${d.ip}`);
+    $('streetCard').classList.remove('hide');
+    $('svFrame').src=`https://www.google.com/maps?q=${d.lat},${d.lon}&layer=c&cbll=${d.lat},${d.lon}&output=svembed`;
+    $('gmapLink').href=`https://www.google.com/maps/search/?api=1&query=${d.lat},${d.lon}`;
+    $('svLink').href=`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${d.lat},${d.lon}`;
+    $('placesCard').classList.remove('hide');
+    loadNearby(d.lat,d.lon);
+    $('deviceCard').classList.remove('hide');
+    $('deviceGrid').innerHTML=deviceInfo().map(([l,v])=>
+      `<div class="info-item"><div class="lbl">${l}</div><div class="val">${v}</div></div>`).join('');
+    $('whoisCard').classList.remove('hide');
+    loadRDAP(ip);
+    setTimeout(()=>{document.querySelector('#resultCard').scrollIntoView({behavior:'smooth'});},150);
+  }catch(e){
+    showSpin(false);
+    showErr('تعذر الاتصال بخدمات الـ IP — حاول مرة ثانية أو غيّر الشبكة (WiFi/جوال). الموقع يجرّب 3 مصادر تلقائيًا.');
+  }
+}
+
+/* ================= 9) الأحداث ================= */
+$('scanBtn').onclick=()=>doScan(currentInput());
+$('ipInput').addEventListener('keydown',e=>{if(e.key==='Enter')doScan(currentInput());});
+
+$('myIpBtn').onclick=async()=>{
+  $('errorArea').innerHTML='';showSpin(true);
+  try{
+    const ip=await getMyIP();
+    $('myIpArea').classList.remove('hide');
+    $('myIpText').textContent=ip;
+    $('ipInput').value=ip;
+    showSpin(false);
+    doScan(ip);
+  }catch(e){showSpin(false);showErr('ما قدرت أحصل على عنوانك — تأكد من اتصال الإنترنت.');}
+};
+
+$('refreshIpBtn').onclick=$('myIpBtn').onclick;
+
+$('permYes').onclick=()=>{
+  $('permission').classList.remove('show');
+  $('myIpBtn').click();
+};
+$('permNo').onclick=()=>$('permission').classList.remove('show');
+
+$('mapSearchBtn').onclick=async()=>{
+  const q=$('mapSearch').value.trim();
+  if(!q)return;
+  try{
+    const j=await (await fetchWithTimeout('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(q),12000)).json();
+    if(j&&j[0]){
+      const lat=+j[0].lat,lon=+j[0].lon;
+      map.flyTo([lat,lon],18);
+      marker.setLatLng([lat,lon]);circle.setLatLng([lat,lon]);
+      currentLat=lat;currentLon=lon;
+      marker.bindPopup(`<b>${j[0].display_name}</b>`).openPopup();
+      updateLocationExtras();
+    }else alert('ما لقيت نتيجة للبحث.');
+  }catch(e){alert('تعذر البحث — حاول مرة ثانية.');}
+};
+
+/* إظهار نافذة الإذن عند الدخول */
+window.addEventListener('load',()=>setTimeout(()=>$('permission').classList.add('show'),600));
+</script>
+</body>
+</html>
